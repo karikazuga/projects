@@ -1,10 +1,12 @@
-CREATE TABLE "location" (
+"""CREATE TABLE "location" (
 	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	"contry"	TEXT NOT NULL UNIQUE,
+	"contry_name"	TEXT NOT NULL UNIQUE,
+	"city_name"	TEXT NOT NULL,
+	"contry_code"	TEXT NOT NULL UNIQUE,
 	"city"	TEXT NOT NULL,
 	"lat"	REAL NOT NULL,
 	"lon"	REAL NOT NULL
-);
+);"""
 
 CREATE TABLE "description" (
 	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,

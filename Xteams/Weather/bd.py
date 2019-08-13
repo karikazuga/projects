@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import json
 import sys
 import sqlite3
@@ -17,9 +18,9 @@ def get_connect(path):
 def create_table(connect):
     sql = f"""CREATE TABLE IF NOT EXISTS "location" (
     	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    	"country_name"	TEXT  UNIQUE,
+    	"country_name"	TEXT,
     	"city_name"	TEXT ,
-    	"country_code"	TEXT NOT NULL UNIQUE,
+    	"country_code"	TEXT NOT NULL,
     	"city"	TEXT NOT NULL,
     	"lat"	REAL NOT NULL,
     	"lon"	REAL NOT NULL
@@ -34,14 +35,18 @@ def get_date(path):
     json_file.close()
     return data
 
-def send_data(element):
+def send_data(element, connect):
     sql = f"""INSERT INTO "location" (
     "country_code",
     "city",
     "lat",
     "lon")
-    VALUE ("{element['country']}", "{element['name']}", {element['coord']['lat']}, {element['coord']['lon']})"""
-    print(sql)
+    VALUES ("{element['country']}", "{element['name']}", {element['coord']['lat']}, {element['coord']['lon']})"""
+    cursor = connect.cursor()
+    cursor.execute(sql)
+    # connect.commit()
+
+
 if __name__=="__main__":
     if len(sys.argv) > 2:
         path = os.path.join(sys.argv[1], sys.argv[2])
@@ -49,9 +54,17 @@ if __name__=="__main__":
         connection = get_connect(path)
         create_table(connection)
         data = get_date("city.list.json")
-        for element in data[:2]:
-            send_data(element)
-        print("OK")
+        len_date = len(data)
+        for id, element in enumerate(data, 1):
+            print(f"{id} from {len_date}", end="\r")
+            try:
+                send_data(element, connection)
+            except Exception as e:
+                print("Error SQL")
+                print(element)
+                print(e)
+        connection.commit()
+        print("/nOK")
     else:
         print("Not arguments")
     # if len(sys.argv) > 1:
