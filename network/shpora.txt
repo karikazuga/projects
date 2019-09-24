@@ -1,0 +1,30 @@
+создаем подключение:
+import socket
+
+HOST = "127.0.0.1"
+PORT = 5000
+
+srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+srv.bind((HOST, PORT))
+srv.listen(20)
+
+цикл:
+while True
+ожидаем соединения
+client, addr = srv.accept()
+получаем соединения
+получаем переменные и данные от адреса и положить в хранилище
+
+Создаем поток:
+с обработчиком и передать в поток соединения.
+в потоке:
+читать данные
+оборобатываьт данные
+отправлять
+закрытие соединения
+удаления из хранилища
+
+
+на дз 
+user name >> user
