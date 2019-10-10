@@ -1,6 +1,20 @@
 from twisted.internet.protocol import Protocol, ClientFactory
 from twisted.internet import reactor
 from twisted.protocols.basic import LineReceiver
+from treading import tread
+import time
+
+MESSAGE = []
+
+
+class Mesage():
+
+
+    @event.Event.origin("new_message", post=True)
+    def add_message(self, message):
+        for _ in range(20):
+            time.sleep(2)
+        message.append("Батя в здании")
 
 
 class ChatClient(Protocol):
@@ -8,12 +22,10 @@ class ChatClient(Protocol):
     def __init__(self, name):
         self.name = name
         self.state = "OFFLINE"
+        self.work = True
+        event.Event(name="new_message", callback=self.send_message)
 
     def connectionMade(self):
-        # while self_work:
-        #     if self.factory.message is not None:
-        #         self.sendLine(self.factory.message.encode("utf-8"))
-        #         factory.message = None 
         pass
 
     def lineReceived(self, data):
@@ -27,7 +39,13 @@ class ChatClient(Protocol):
     def connectionlost(self, reason):
         pass
 
-    def send_message(self, message):
+    def send_message(self, *args, **kwargs):
+
+        try:
+            message = MESSAGE[0]
+        except IndexError:
+            print("Error")
+        MESSAGE.remove(message)
         self.sendLine("{}\n".formate(message).encode("utf-8"))
 
 
@@ -35,7 +53,6 @@ class ChatClientFactory(ClientFactory):
 
     def __init__(self, name, callback):
         self.name = name
-        self.massage.= "None"
 
     def clientConnectionFailed(self, connector, reason):
         print("Failed.")
@@ -47,18 +64,20 @@ class ChatClientFactory(ClientFactory):
 
     def bieldprotocol(self, addr):
         self.connection = ChatClient(self.name)
-        # return self.connection.factory = self
+        message = Message()
+        worker = Tread(target=message.add_message, args=[MESSAGE, ])
+        worker.start()
         return self.connection
 
+
 if __name__ == "__main__":
-    import time
-    #  Залить парсер аргументов
-    chat = ChatClientFactory("Gena")
+
+    chat = ChatClientFactory("Ruby")
     reactor.connectTCP("192.168.4.123", 5000, chat)
     reactor.run()
-    while True:
-        chat.send("Message")
-        time.sleep(3)
+    # while True:
+    #     chat.send("Message")
+    #     time.sleep(3)
 
 
 
