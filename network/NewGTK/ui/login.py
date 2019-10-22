@@ -1,12 +1,14 @@
 import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
+from ui import event
 
 
-class loginWindow(Gtk.Window):
+class LoginWindow(Gtk.Window):
 
-    def __init__(self):
+    def __init__(self, callback):
         super().__init__(title="Mega Chat | Login")
+        event.Event(name="login", callback=callback)
         self.is_login = False
         self.is_password = False
         self.set_border_width(50)
@@ -67,37 +69,27 @@ class loginWindow(Gtk.Window):
     def on_registration(self, button):
         pass
 
+    @event.Event.origin("login", post=True)
     def on_sign_in(self, button):
         login = self.login.get_text()
         password = self.password.get_text()
+        storage = redis.StrictRedis()
+        storage.set("login", self.login.get_text())
+        storage.set("password", self.password.get_text())
+        storage.expire("login", 10)
+        storage.expire("password", 10)
         print(login, password)
 
-    def __check_entry(self, entry, name):
-        entrys = {
-        "login": lambda x: self.is_login=x
-        "password": lambda x: self.is_password=x }
-        if len(entry.get_text()) > 2:
-            if name = "login":
-                self.is_login = True
-            if name = "Password":
-                self.is_password = True
-            name = True
-            print("True")
-        else:
-            name = False
-            self.is_login = False
-        if self.is_login and self.is_password:
-            self.sing_in.set_sensitive(True)
-        else:
-            self.sing_in.set_sensitive(False)
+    # def __check_entry(self):
+    #     self.sing_in.set_sensitive(self.is_login and self.is_password)
 
     def on_change_login(self, entry):
-        self.__check_entry(entry, self.is_login)
-        print("sdsd")
+        self.is_login = True if len(entry.get_text()) > 2 else False
+        self.sing_in.set_sensitive(self.is_login and self.is_password)
 
     def on_change_password(self, entry):
-        self.__check_entry(entry, self.is_password)
-        print("sdsd")
+        self.is_password = True if len(entry.get_text()) > 2 else False
+        self.sing_in.set_sensitive(self.is_login and self.is_password)
 
 
 
